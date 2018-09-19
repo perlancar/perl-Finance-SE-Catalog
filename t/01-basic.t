@@ -6,32 +6,35 @@ use warnings;
 use Test::Exception;
 use Test::More 0.98;
 
-use CryptoCurrency::Catalog;
+use Finance::SE::Catalog;
 
-my $cat = CryptoCurrency::Catalog->new;
+my $cat = Finance::SE::Catalog->new;
 
 subtest "by_code" => sub {
-    is_deeply($cat->by_code("btc"), {code=>"BTC", name=>"Bitcoin", safename=>"bitcoin"});
-    dies_ok { $cat->by_code("FOO") };
-};
+    my $res;
 
-subtest "by_ticker" => sub {
-    is_deeply($cat->by_ticker("btc"), {code=>"BTC", name=>"Bitcoin", safename=>"bitcoin"});
+    ok($res = $cat->by_code("idx"));
+    is($res->{code}, "IDX");
+
+    ok($res = $cat->by_code("BEI"));
+    is($res->{code}, "IDX");
+
+    ok($res = $cat->by_code("bej"));
+    is($res->{code}, "IDX");
+
+    dies_ok { $res = $cat->by_code("xxx") };
 };
 
 subtest "by_name" => sub {
-    is_deeply($cat->by_name("Ethereum"), {code=>"ETH", name=>"Ethereum", safename=>"ethereum"});
-    is_deeply($cat->by_name("ethereum"), {code=>"ETH", name=>"Ethereum", safename=>"ethereum"});
+    my $res;
+
+    ok($res = $cat->by_name("new york stock exchange"));
+    ok($res->{code}, "IDX");
+
+    ok($res = $cat->by_name("Bursa Efek Indonesia"));
+    ok($res->{code}, "IDX");
+
     dies_ok { $cat->by_name("foo bar") };
-};
-
-subtest "by_safename" => sub {
-    is_deeply($cat->by_safename("ethereum"), {code=>"ETH", name=>"Ethereum", safename=>"ethereum"});
-    dies_ok { $cat->by_safename("foo") };
-};
-
-subtest "by_slug" => sub {
-    is_deeply($cat->by_slug("ETHEREUM"), {code=>"ETH", name=>"Ethereum", safename=>"ethereum"});
 };
 
 subtest "all_codes" => sub {
